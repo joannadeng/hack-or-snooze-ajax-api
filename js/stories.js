@@ -80,9 +80,6 @@ function putStoriesOnPage() {
   $myStoryList.empty();
 
   // loop through all of currentUser's favorite stories and generate HTML for them
-  // if (!currentUser) {
-  //   return;
-  // }
 
   for (let story of currentUser.ownStories) {
     const $story = generateStoryMarkup(story);
@@ -96,8 +93,7 @@ async function createStory(evt){
   console.debug("createStory",evt);
   evt.preventDefault();
 
-  $newStoryDisplay.empty();//empty the ul before displaying new story
-
+  $newStoryDisplay.empty();
   const title = $("#new-story-title").val();
   const author = $("#new-story-author").val();
   const url = $("#new-story-url").val();
@@ -105,24 +101,18 @@ async function createStory(evt){
   const newStory = await storyList.addStory(currentUser,{title,author,url});
 
   const $story = generateStoryMarkup(newStory);
-  $newStoryDisplay.append($story); // add new Story to html  ????? why cant append ????
-  console.log("hello?");
-
+  $newStoryDisplay.append($story); // add new Story to html  ????? why not appending ????
   $myStoryList.append($story);
 
   hidePageComponents();
   $newStoryDisplay.show();  //show new Story in UI
-  // $newStoryForm.hide();
   $newStoryForm.trigger("reset");
-
-  console.log(newStory);
 
   // update all stories list asychronously
   storyList.stories.push(newStory);
   storyList = await StoryList.getStories();
 
   currentUser.ownStories.push(newStory); 
-  
 }
 
 $newStoryForm.on('submit',createStory);
@@ -137,8 +127,6 @@ $newStoryForm.on('submit',createStory);
 
   const $li = evt.target.closest('li');
   
-  // $('#favorites-list li button small').text("remove favorite");
-  
   const $storyId = $li.id;
   const result = currentUser.favorites.some(s => s.storyId === $storyId);
   if(result){
@@ -151,10 +139,7 @@ $newStoryForm.on('submit',createStory);
   putStoriesOnPage(); 
 }
 
-// $allStoriesList.on('click','input',function(e){
-//   console.log(e.target.checked);
-//     // addFavoriteStory(e);
-// })
+
 $allStoriesList.on('click','input', addFavoriteStory);
 
 
@@ -178,10 +163,16 @@ $li.remove();
 
 $favoritesList.on("click","input",removeFavoriteStory);
 
-//   if(e.target.checked){
-//     removeFavoriteStory(e);
+
+// not working
+// const $checkbox = $("#all-stories-list input");
+// $checkbox.change(function(){
+//   if($(this).is(':checked')) {
+//     addFavoriteStory();
+//   }else{
+//     removeFavoriteStory();
 //   }
-// });
+// })
 
 async function deleteOwnStory(evt){
   console.debug('deleteOwnStory',evt);
