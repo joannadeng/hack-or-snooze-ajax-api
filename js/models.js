@@ -210,6 +210,9 @@ class User {
       return null;
     }
   }
+  // async updateMyOwnStories(story){
+  //   await this.ownStories.push(story);
+  // }
 
   async addAFavorite(story){
     this.favorites.push(story);
@@ -229,5 +232,16 @@ class User {
       method,
       data:{token},
     })
+  }
+
+  async deleteStory(user,storyID){
+    const token = user.loginToken;
+    const res = await axios({
+      url:`${BASE_URL}/stories/${storyID}`,
+      method:"DELETE",
+      data:{token},
+    })
+    console.log(res.message);
+    return res.story;
   }
 }

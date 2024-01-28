@@ -21,6 +21,8 @@ const $newStoryDisplay = $("#new-story-display");
 const $favoritesList = $("#favorites-list");
 const $navFavorites = $("#nav-favorites");
 const $userProfile = $("#user-profile");
+const $myStoryList = $("#my-stories-list");
+const $navMyStories = $("#nav-my-stories");
 
 
 /** To make it easier for individual components to show just themselves, this
@@ -38,6 +40,7 @@ function hidePageComponents() {
     $newStoryDisplay,
     $favoritesList,
     $userProfile,
+    $myStoryList, 
   ];
   components.forEach(c => c.hide());
 }

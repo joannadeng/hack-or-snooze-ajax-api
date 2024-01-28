@@ -8,8 +8,17 @@
 
 function navAllStories(evt) {
   console.debug("navAllStories", evt);
-  hidePageComponents();
-  putStoriesOnPage();
+  if(currentUser){
+    hidePageComponents();
+    putStoriesOnPage();
+    $navMyStories.show();
+    $navFavorites.show();
+    $navSubmit.show();
+  }else{
+    hidePageComponents();
+    putStoriesOnPage();
+  }
+  
 }
 
 $body.on("click", "#nav-all", navAllStories);
@@ -32,28 +41,38 @@ function updateNavOnLogin() {
   $(".main-nav-links").show();
   $navLogin.hide();
   $navLogOut.show();
+
+  $navMyStories.show();
+  $navFavorites.show();
+  $navSubmit.show();
+
   $navUserProfile.text(`${currentUser.username}`).show();
   $userProfile.append(`<p class="name"> Name:${currentUser.name} </p>`);
   $userProfile.append(`<p class="username"> Username:${currentUser.username} </p>`);
   const time = currentUser.createdAt.substring(0,10);
   $userProfile.append(`<p class="name"> Account Createdat: ${time} </p>`);
-  console.log("did i add the info?")
 }
 // 
 
 function navSubmitClick(evt) {
   console.debug("navSubmitClick",evt);
+  $navMyStories.show();
+  $navFavorites.show();
+  $navSubmit.show();
   hidePageComponents();
   $newStoryForm.show();
+
 }
 $navSubmit.on("click",navSubmitClick);
 
 
-function showFavoritesList(evt){
+ function showFavoritesList(evt){
   console.debug("showFavoritesList",evt);
+  $navMyStories.show();
+  $navFavorites.show();
+  $navSubmit.show();
   hidePageComponents();
   $favoritesList.show();
-
 }
 $navFavorites.on("click",showFavoritesList);
 
@@ -63,5 +82,16 @@ function showUserProfile(evt){
   $userProfile.show();
 }
 $navUserProfile.on('click',showUserProfile);
+
+function showMyStoriesList(evt){
+  console.debug("showMyStoriesList",evt);
+  $navMyStories.show();
+  $navFavorites.show();
+  $navSubmit.show();
+  hidePageComponents();
+  $myStoryList.show();
+}
+
+$navMyStories.on('click',showMyStoriesList);
 
 
