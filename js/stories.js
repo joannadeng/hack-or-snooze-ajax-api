@@ -57,7 +57,7 @@ function putStoriesOnPage() {
   $allStoriesList.show();
 }
 
- function putFavoriteStoriesOnPage() {
+  function putFavoriteStoriesOnPage() {
   console.debug("putFavoriteStoriesOnPage");
 
   $favoritesList.empty();
@@ -69,7 +69,6 @@ function putStoriesOnPage() {
 
   for (let story of currentUser.favorites) {
     const $story = generateStoryMarkup(story);
-    // $story[0].childNodes[1].remove();
     $favoritesList.append($story);
   }
 }
@@ -83,7 +82,6 @@ function putStoriesOnPage() {
 
   for (let story of currentUser.ownStories) {
     const $story = generateStoryMarkup(story);
-    // $story[0].childNodes[1].remove();
     $myStoryList.append($story);
   }
 }
@@ -98,28 +96,29 @@ async function createStory(evt){
   const author = $("#new-story-author").val();
   const url = $("#new-story-url").val();
 
+  // this is to add story at server end
   const newStory = await storyList.addStory(currentUser,{title,author,url});
 
-  const $story = generateStoryMarkup(newStory);
-  $newStoryDisplay.append($story); // add new Story to html  ????? why not appending ????
+  // this is to make the front end html for the new story 
+  const $story = generateStoryMarkup(newStory); //html 
   $myStoryList.append($story);
-
-  hidePageComponents();
-  $newStoryDisplay.show();  //show new Story in UI
+  
   $newStoryForm.trigger("reset");
 
   // update all stories list asychronously
   storyList.stories.push(newStory);
   storyList = await StoryList.getStories();
-
+  putStoriesOnPage();
+  $newStoryForm.hide();
   currentUser.ownStories.push(newStory); 
 }
 
 $newStoryForm.on('submit',createStory);
 
- async function addFavoriteStory(evt){
+
+  async function addFavoriteStory(evt){
   console.debug("addFavoriteStory",evt);
-  evt.preventDefault();
+  // evt.preventDefault();
 
   if(!currentUser){
     return;
@@ -139,9 +138,70 @@ $newStoryForm.on('submit',createStory);
   putStoriesOnPage(); 
 }
 
-
 $allStoriesList.on('click','input', addFavoriteStory);
 
+ async function removeFavoriteStory(evt){
+  console.debug('removeFavoriteStory',evt);
+  // evt.preventDefault();
+  
+  const $li = evt.target.closest('li');
+  const storyId = $li.id;
+  const story = await GetAStory(storyId);
+  currentUser.removeFavorite(story);
+  $li.remove();
+  }
+
+$favoritesList.on("click","input",removeFavoriteStory);
+
+  
+  
+  // async function toggleStoryFavorite(evt) {
+  //   console.debug("toggleStoryFavorite");
+  //   // evt.preventDefault();
+  //   const $input = evt.target;
+  //   const $li = evt.target.closest('li');;
+  //   console.log($li);
+  //   const $storyId = $li.id;
+  //   const story = GetAStory($storyId);
+  //   const result = currentUser.favorites.some(s => s.storyId === $storyId);
+  //   if(result){
+  //       return;
+  //     }
+  //   if($input.checked){
+  //     console.log("hello");
+  //     await currentUser.addAFavorite(story);
+  //     console.log("added");
+  //     $favoritesList.append($li);
+  //     putStoriesOnPage();
+  //   }else{
+  //     console.log('removed');
+  //     currentUser.removeFavorite(story);
+  //     $li.remove();
+  //   }
+  // }
+  // $allStoriesList.on('click','input',toggleStoryFavorite);
+
+async function deleteOwnStory(evt){
+  console.debug('deleteOwnStory',evt);
+  evt.preventDefault();
+
+  const $li = evt.target.closest('li');
+  const $storyId = $li.id;
+  await currentUser.deleteStory(currentUser,$storyId);
+  $li.remove(); 
+   storyList.stories = storyList.stories.filter(function(s){
+    return s.storyId !== $storyId;
+  })
+   currentUser.ownStories = currentUser.ownStories.filter(function(s){
+    return s.storyId !== $storyId;
+  })
+   currentUser.favorites = currentUser.favorites.filter(function(s){
+    return s.storyId !== $storyId;
+  })
+   
+}
+
+$myStoryList.on('click','input',deleteOwnStory);
 
 async function GetAStory(storyId){
   const response = await axios.get(`https://hack-or-snooze-v3.herokuapp.com/stories/${storyId}`)
@@ -150,18 +210,7 @@ async function GetAStory(storyId){
   return story;
 }
 
-async function removeFavoriteStory(evt){
-console.debug('removeFavoriteStory',evt);
-evt.preventDefault();
 
-const $li = evt.target.closest('li');
-const storyId = $li.id;
-const story = await GetAStory(storyId);
-currentUser.removeFavorite(story);
-$li.remove();
-}
-
-$favoritesList.on("click","input",removeFavoriteStory);
 
 
 // not working
@@ -174,23 +223,8 @@ $favoritesList.on("click","input",removeFavoriteStory);
 //   }
 // })
 
-async function deleteOwnStory(evt){
-  console.debug('deleteOwnStory',evt);
-  evt.preventDefault();
 
-  const $li = evt.target.closest('li');
-  const $storyId = $li.id;
-  await currentUser.deleteStory(currentUser,$storyId);
-  $li.remove();
-  storyList.stories = storyList.stories.filter(function(s){
-    return s.storyId !== $storyId;
-  })
-  currentUser.ownStories = currentUser.ownStories.filter(function(s){
-    return s.storyId !== $storyId;
-  })
-}
 
-$myStoryList.on('click','input',deleteOwnStory);
 
 
 
